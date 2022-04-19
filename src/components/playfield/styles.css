@@ -1,0 +1,12 @@
+.playfield {
+  padding: 1rem;
+  border: 4px solid white;
+  border-radius: 4px;
+}
+
+.playfieldInner {
+  width: 320px;
+  height: 640px;
+  outline: 4px solid white;
+  border-radius: 2px;
+}

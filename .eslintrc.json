@@ -18,6 +18,7 @@
   "rules": {
     "linebreak-style": "off",
     "indent": "off",
-    "max-len": ["error", {"code": 80, "ignorePattern": "^import .*"}]
+    "max-len": ["error", {"code": 80, "ignorePattern": "^import .*"}],
+    "react/prop-types": "off"
   }
 }
