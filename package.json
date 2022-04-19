@@ -1,0 +1,39 @@
+{
+  "name": "react-bolierplate-javascript",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "webpack serve --mode development",
+    "build": "webpack --mode production",
+    "serve": "serve -l 80 -s build",
+    "start": "yarn build && yarn serve",
+    "lint": "eslint ./src --ext .js --ext .jsx"
+  },
+  "repository": "https://github.com/bluewood-truth/react-bolierplate/js",
+  "author": "bluewood <bluewood.truth@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "html-webpack-plugin": "^5.5.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.17.9",
+    "@babel/eslint-parser": "^7.17.0",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "@types/react": "^18.0.5",
+    "@types/react-dom": "^18.0.1",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.2.4",
+    "copy-webpack-plugin": "^10.2.4",
+    "css-loader": "^6.7.1",
+    "eslint": "^8.13.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-react": "^7.29.4",
+    "eslint-plugin-react-hooks": "^4.4.0",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.8.1"
+  }
+}
