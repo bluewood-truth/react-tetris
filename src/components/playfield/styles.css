@@ -9,4 +9,11 @@
   height: 640px;
   outline: 4px solid white;
   border-radius: 2px;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.row {
+  width: 100%;
+  display: flex;
 }
