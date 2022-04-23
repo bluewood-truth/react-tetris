@@ -7,7 +7,6 @@ export const ACTION = {
   MOVE: 'MOVE',
   HARD_DROP: 'HARD_DROP',
 };
-// export const STATE = {FAIL: 'FAIL', SUCCESS: 'SUCCESS', ERROR: 'ERROR'};
 export const DIRECTION = {LEFT: [0, -1], RIGHT: [0, 1], DOWN: [-1, 0]};
 
 export const action = (actionType, callback, block, field, direction) => {
@@ -35,10 +34,12 @@ export const action = (actionType, callback, block, field, direction) => {
   }
 
   const isCollision = checkCollision(newBlock, field);
-  if (isCollision) return block;
+  if (isCollision) {
+    if (callback.fail) callback.fail(block);
+    return;
+  }
 
-  if (callback) callback();
-  return newBlock;
+  if (callback.success) callback.success(newBlock);
 };
 
 const drop = (block) => {
@@ -51,20 +52,14 @@ const drop = (block) => {
 
 const rotate = (block) => {
   const newBlock = deepCopy(block);
-  console.log(block.cells);
   block.cells.forEach((cellRow, row) => {
-    console.log('row', row);
     cellRow.forEach((cell, col) => {
-      console.log('col', col);
-      console.log('before', row, col);
       let [newRow, newCol] = [col, row];
       newCol = cellRow.length - 1 - newCol;
       newBlock.cells[newRow][newCol] = cell;
-      console.log('after', row, col);
     });
   });
   newBlock.rotate = (block.rotate + 1) % 4;
-  console.log(newBlock.cells);
 
   return newBlock;
 };

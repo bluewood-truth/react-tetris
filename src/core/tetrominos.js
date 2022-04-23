@@ -75,5 +75,5 @@ export const getSevenBag = () => {
     keys.splice(randomIndex, 1);
   }
 
-  return randomized.map((key) => tetrominos[key]);
+  return randomized;
 };

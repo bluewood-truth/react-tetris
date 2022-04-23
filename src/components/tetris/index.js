@@ -11,7 +11,7 @@ export const Tetris = () => {
   const [block, setBlock] = useState({
     ...tetrominos['I'],
     rotate: 0,
-    position: [13, 3],
+    position: [20, 3],
   });
 
   return (
@@ -38,15 +38,19 @@ export const Tetris = () => {
         <Panel label='ACTION TEST'>
           <button
             onClick={() => {
-              setBlock((prev) =>
-                action(
-                  ACTION.DROP,
-                  () => {
+              action(
+                ACTION.DROP,
+                {
+                  success: (block) => {
                     console.log('drop');
+                    setBlock(block);
                   },
-                  prev,
-                  field
-                )
+                  fail: () => {
+                    console.log('collision');
+                  },
+                },
+                block,
+                field
               );
             }}
           >
@@ -54,15 +58,19 @@ export const Tetris = () => {
           </button>
           <button
             onClick={() => {
-              setBlock((prev) =>
-                action(
-                  ACTION.ROTATE,
-                  () => {
+              action(
+                ACTION.ROTATE,
+                {
+                  success: (block) => {
                     console.log('rotate');
+                    setBlock(block);
                   },
-                  prev,
-                  field
-                )
+                  fail: () => {
+                    console.log('collision');
+                  },
+                },
+                block,
+                field
               );
             }}
           >
@@ -70,16 +78,20 @@ export const Tetris = () => {
           </button>
           <button
             onClick={() => {
-              setBlock((prev) =>
-                action(
-                  ACTION.MOVE,
-                  () => {
+              action(
+                ACTION.MOVE,
+                {
+                  success: (block) => {
                     console.log('move left');
+                    setBlock(block);
                   },
-                  prev,
-                  field,
-                  DIRECTION.LEFT
-                )
+                  fail: () => {
+                    console.log('collision');
+                  },
+                },
+                block,
+                field,
+                DIRECTION.LEFT
               );
             }}
           >
@@ -87,16 +99,20 @@ export const Tetris = () => {
           </button>
           <button
             onClick={() => {
-              setBlock((prev) =>
-                action(
-                  ACTION.MOVE,
-                  () => {
+              action(
+                ACTION.MOVE,
+                {
+                  success: (block) => {
                     console.log('move right');
+                    setBlock(block);
                   },
-                  prev,
-                  field,
-                  DIRECTION.RIGHT
-                )
+                  fail: () => {
+                    console.log('collision');
+                  },
+                },
+                block,
+                field,
+                DIRECTION.RIGHT
               );
             }}
           >
