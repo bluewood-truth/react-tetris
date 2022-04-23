@@ -39,11 +39,11 @@
 
 - [x] 기본 컴포넌트, CSS 작성
 - [x] 플레이필드 위에 블록 그리기 기능 구현
-- [ ] 블록 행동 구현
-  - [ ] Drop
-  - [ ] Rotate
-  - [ ] Move
-  - [ ] Hard drop
+- [x] 블록 행동 구현
+  - [x] Drop
+  - [x] Rotate
+  - [x] Move
+  - [x] Hard drop
 - [ ] 블록 고정 구현
   - [ ] 락 딜레이
   - [ ] 블록 고정

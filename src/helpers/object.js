@@ -12,14 +12,6 @@ export const deepCopy = (target) => {
   }
 };
 
-export const createMatrix = (size, initialValue = 0) => {
-  return [
-    Array(size)
-      .fill(initialValue)
-      .map(() => Array(size).fill(initialValue)),
-  ];
-};
-
 export const sumArray = (a, b) => {
   if (a.length !== b.length) {
     throw new Error(`Two array's length is different.`);
