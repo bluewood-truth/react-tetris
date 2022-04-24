@@ -7,7 +7,7 @@ export const ACTION = {
   MOVE: 'MOVE',
   HARD_DROP: 'HARD_DROP',
 };
-export const DIRECTION = {LEFT: [0, -1], RIGHT: [0, 1], DOWN: [-1, 0]};
+export const DIRECTION = {LEFT: [0, 1], RIGHT: [0, -1], DOWN: [-1, 0]};
 
 export const action = (actionType, callback, block, field, direction) => {
   let newBlock = null;
@@ -25,6 +25,7 @@ export const action = (actionType, callback, block, field, direction) => {
       let tempNewBlock = block;
       while (!checkCollision(drop(tempNewBlock), field)) {
         newBlock = drop(tempNewBlock);
+        tempNewBlock = newBlock;
       }
       break;
     }
@@ -72,8 +73,6 @@ const move = (tetromino, direction) => {
 
 const checkCollision = (block, field) => {
   let isCollision = false;
-
-  console.log(block);
 
   block.cells.forEach((cellRow, row) => {
     if (isCollision) return;

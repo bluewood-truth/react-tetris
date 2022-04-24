@@ -1,18 +1,17 @@
-import React, {useState} from 'react';
-import {ACTION, action, DIRECTION} from 'src/core/action';
-import {createPlayfield, renderBlock} from 'src/core/render';
-import {tetrominos} from 'src/core/tetrominos';
+import React from 'react';
+import {renderBlock} from 'src/core/render';
+import {useBlock} from 'src/hooks/useBlock';
+import {usePlayfield} from 'src/hooks/usePlayfield';
 import {Layout} from '../layout';
 import {PanelGroup, Panel} from '../panel';
 import {Playfield} from '../playfield';
 
 export const Tetris = () => {
-  const [field] = useState(createPlayfield());
-  const [block, setBlock] = useState({
-    ...tetrominos['I'],
-    rotate: 0,
-    position: [20, 3],
-  });
+  const {field, lock} = usePlayfield();
+  const {block, setNewBlock, drop, rotate, move, hardDrop} = useBlock(
+    field,
+    'I'
+  );
 
   return (
     <Layout>
@@ -24,10 +23,7 @@ export const Tetris = () => {
               <button
                 key={v}
                 onClick={() => {
-                  setBlock((prev) => ({
-                    ...prev,
-                    ...tetrominos[v],
-                  }));
+                  setNewBlock(v);
                 }}
               >
                 {v}
@@ -38,85 +34,49 @@ export const Tetris = () => {
         <Panel label='ACTION TEST'>
           <button
             onClick={() => {
-              action(
-                ACTION.DROP,
-                {
-                  success: (block) => {
-                    console.log('drop');
-                    setBlock(block);
-                  },
-                  fail: () => {
-                    console.log('collision');
-                  },
-                },
-                block,
-                field
-              );
+              drop();
             }}
           >
             DROP
           </button>
           <button
             onClick={() => {
-              action(
-                ACTION.ROTATE,
-                {
-                  success: (block) => {
-                    console.log('rotate');
-                    setBlock(block);
-                  },
-                  fail: () => {
-                    console.log('collision');
-                  },
-                },
-                block,
-                field
-              );
+              rotate();
             }}
           >
             ROTATE
           </button>
           <button
             onClick={() => {
-              action(
-                ACTION.MOVE,
-                {
-                  success: (block) => {
-                    console.log('move left');
-                    setBlock(block);
-                  },
-                  fail: () => {
-                    console.log('collision');
-                  },
-                },
-                block,
-                field,
-                DIRECTION.LEFT
-              );
+              move('LEFT');
             }}
           >
             MOVE LEFT
           </button>
           <button
             onClick={() => {
-              action(
-                ACTION.MOVE,
-                {
-                  success: (block) => {
-                    console.log('move right');
-                    setBlock(block);
-                  },
-                  fail: () => {
-                    console.log('collision');
-                  },
-                },
-                block,
-                field,
-                DIRECTION.RIGHT
-              );
+              move('RIGHT');
             }}
           >
             MOVE RIGHT
+          </button>
+          <button
+            onClick={() => {
+              hardDrop();
+            }}
+          >
+            HARD DROP
+          </button>
+        </Panel>
+        <Panel label='LOCK TEST'>
+          <button
+            onClick={() => {
+              lock(block, () => {
+                setNewBlock('I');
+              });
+            }}
+          >
+            LOCK
           </button>
         </Panel>
       </PanelGroup>
