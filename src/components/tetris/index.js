@@ -13,9 +13,36 @@ export const Tetris = () => {
     'I'
   );
 
+  const handleKeyDown = (e) => {
+    console.log(e.key);
+    switch (e.key) {
+      case 'ArrowLeft':
+        move('LEFT');
+        break;
+      case 'ArrowRight':
+        move('RIGHT');
+        break;
+      case 'ArrowDown':
+        drop();
+        break;
+      case 'ArrowUp':
+        rotate();
+        break;
+      case ' ':
+        hardDrop();
+        break;
+      case 'Enter':
+        lock(block, () => {
+          setNewBlock('I');
+        });
+        break;
+    }
+  };
+  console.log(block);
+
   return (
     <Layout>
-      <Playfield field={renderBlock(field, block)} />
+      <Playfield field={renderBlock(field, block)} onKeyDown={handleKeyDown} />
       <PanelGroup>
         <Panel label='SHAPE TEST'>
           {['I', 'O', 'J', 'L', 'Z', 'S', 'T'].map((v) => {
