@@ -18,6 +18,8 @@ export const createCell = (color, isEmpty = true) => {
 };
 
 export const renderBlock = (field, block) => {
+  if (!block) return field;
+
   field = deepCopy(field);
   block.cells.forEach((cellRow, row) => {
     cellRow.map((cell, col) => {

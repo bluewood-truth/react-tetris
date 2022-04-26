@@ -7,9 +7,14 @@ export const ACTION = {
   MOVE: 'MOVE',
   HARD_DROP: 'HARD_DROP',
 };
+export const ACTION_STATE = {
+  SUCCESS: 'SUCCESS',
+  FAIL: 'FAIL',
+  ERROR: 'ERROR',
+};
 export const DIRECTION = {LEFT: [0, 1], RIGHT: [0, -1], DOWN: [-1, 0]};
 
-export const action = (actionType, callback, block, field, direction) => {
+export const action = (actionType, block, field, direction) => {
   let newBlock = null;
   switch (actionType) {
     case ACTION.DROP:
@@ -30,24 +35,20 @@ export const action = (actionType, callback, block, field, direction) => {
       break;
     }
     default:
-      console.warn('Invalid action!');
-      return block;
+      return {block, state: ACTION_STATE.ERROR};
   }
 
   const isCollision = checkCollision(newBlock, field);
   if (isCollision) {
-    if (callback.fail) callback.fail(block);
-    return;
+    return {message: 'collision', state: ACTION_STATE.FAIL};
   }
 
-  if (callback.success) callback.success(newBlock);
+  return {block: newBlock, state: ACTION_STATE.SUCCESS};
 };
 
 const drop = (block) => {
   const newBlock = deepCopy(block);
-
   newBlock.position = sumArray(newBlock.position, DIRECTION.DOWN);
-
   return newBlock;
 };
 
