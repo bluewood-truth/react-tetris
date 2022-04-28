@@ -1,10 +1,6 @@
-import {deepCopy, sumArray} from 'src/helpers/object';
-import {FIELD_HEIGHT, FIELD_WIDTH} from './render';
+import {deepCopy, rotateMatrix, sumArray} from 'src/helpers/object';
+import {FIELD_HEIGHT, FIELD_WIDTH} from './field';
 
-export const TRANSFORM = {
-  ROTATE: 'ROTATE',
-  MOVE: 'MOVE',
-};
 export const TRANSFORM_STATE = {
   SUCCESS: 'SUCCESS',
   FAIL: 'FAIL',
@@ -15,45 +11,30 @@ export const DIRECTION = {LEFT: 'LEFT', RIGHT: 'RIGHT', BOTTOM: 'BOTTOM'};
 
 const DIRECTION_MOVE = {LEFT: [0, 1], RIGHT: [0, -1], BOTTOM: [-1, 0]};
 
-export const transform = (transformType, block, field, direction) => {
-  let newBlock = null;
-  switch (transformType) {
-    case TRANSFORM.ROTATE:
-      newBlock = rotate(block);
-      break;
-    case TRANSFORM.MOVE:
-      newBlock = move(block, direction);
-      break;
-    default:
-      return {block, state: TRANSFORM_STATE.ERROR};
-  }
+export const transform = {
+  rotate(block, field) {
+    const newBlock = deepCopy(block);
+    newBlock.cells = rotateMatrix(newBlock.cells);
+    newBlock.rotate = (block.rotate + 1) % 4;
 
-  const isCollision = checkCollision(newBlock, field);
-  if (isCollision) {
-    return {message: 'collision', state: TRANSFORM_STATE.FAIL};
-  }
+    return this.response(newBlock, field);
+  },
 
-  return {block: newBlock, state: TRANSFORM_STATE.SUCCESS};
-};
+  move(block, field, direction) {
+    const newBlock = deepCopy(block);
+    newBlock.position = sumArray(block.position, DIRECTION_MOVE[direction]);
 
-const rotate = (block) => {
-  const newBlock = deepCopy(block);
-  block.cells.forEach((cellRow, row) => {
-    cellRow.forEach((cell, col) => {
-      let [newRow, newCol] = [col, row];
-      newCol = cellRow.length - 1 - newCol;
-      newBlock.cells[newRow][newCol] = cell;
-    });
-  });
-  newBlock.rotate = (block.rotate + 1) % 4;
+    return this.response(newBlock, field);
+  },
 
-  return newBlock;
-};
+  response(newBlock, field) {
+    const isCollision = checkCollision(newBlock, field);
+    if (isCollision) {
+      return {message: 'collision', state: TRANSFORM_STATE.FAIL};
+    }
 
-const move = (block, direction) => {
-  const newBlock = deepCopy(block);
-  newBlock.position = sumArray(block.position, DIRECTION_MOVE[direction]);
-  return newBlock;
+    return {block: newBlock, state: TRANSFORM_STATE.SUCCESS};
+  },
 };
 
 const checkCollision = (block, field) => {

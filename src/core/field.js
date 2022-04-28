@@ -3,7 +3,7 @@ import {deepCopy, sumArray} from 'src/helpers/object';
 export const FIELD_WIDTH = 10;
 export const FIELD_HEIGHT = 20;
 
-export const createPlayfield = (width = FIELD_WIDTH, height = FIELD_HEIGHT) => {
+export const createField = (width = FIELD_WIDTH, height = FIELD_HEIGHT) => {
   return Array(height)
     .fill(null)
     .map(() =>
@@ -45,7 +45,7 @@ export const clearLine = (field) => {
   const clearLineCount = clearLineIndex.length;
   const newField = [
     ...field.filter((_, i) => !clearLineIndex.includes(i)),
-    ...createPlayfield(FIELD_WIDTH, clearLineCount),
+    ...createField(FIELD_WIDTH, clearLineCount),
   ];
   return [newField, clearLineCount];
 };

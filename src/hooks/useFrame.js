@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef} from 'react';
 
-export const MS_PER_FRAME = 1000 / 60;
+const MS_PER_FRAME = 1000 / 60;
 
 export const useFrame = ({tick, isEnabled, initialValue = 0}) => {
   const frame = useRef(initialValue);
@@ -21,7 +21,6 @@ export const useFrame = ({tick, isEnabled, initialValue = 0}) => {
     if (!isEnabled) return;
 
     const id = setInterval(() => {
-      console.log(frame.current);
       setFrame((prev) => prev + 1);
     }, MS_PER_FRAME);
 
