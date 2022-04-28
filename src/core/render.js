@@ -13,13 +13,14 @@ export const createPlayfield = (width = FIELD_WIDTH, height = FIELD_HEIGHT) => {
     );
 };
 
-export const createCell = (color, isEmpty = true) => {
-  return {color, isEmpty};
+export const createCell = (color, isEmpty = true, isLock = false) => {
+  return {color, isEmpty, isLock};
 };
 
-export const renderBlock = (field, block) => {
+export const renderBlock = (field, block, isLock = false) => {
   if (!block) return field;
 
+  console.log(isLock);
   field = deepCopy(field);
   block.cells.forEach((cellRow, row) => {
     cellRow.map((cell, col) => {
@@ -28,7 +29,7 @@ export const renderBlock = (field, block) => {
       const [fieldRow, fieldCol] = sumArray([row, col], block.position);
 
       if (fieldRow >= FIELD_HEIGHT || fieldCol >= FIELD_WIDTH) return;
-      field[fieldRow][fieldCol] = createCell(block.color, false);
+      field[fieldRow][fieldCol] = createCell(block.color, false, isLock);
     });
   });
   return field;

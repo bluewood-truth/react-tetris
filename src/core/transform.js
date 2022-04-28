@@ -1,55 +1,39 @@
 import {deepCopy, sumArray} from 'src/helpers/object';
 import {FIELD_HEIGHT, FIELD_WIDTH} from './render';
 
-export const ACTION = {
-  DROP: 'DROP',
+export const TRANSFORM = {
   ROTATE: 'ROTATE',
   MOVE: 'MOVE',
-  HARD_DROP: 'HARD_DROP',
 };
-export const ACTION_STATE = {
+export const TRANSFORM_STATE = {
   SUCCESS: 'SUCCESS',
   FAIL: 'FAIL',
   ERROR: 'ERROR',
 };
-export const DIRECTION = {LEFT: [0, 1], RIGHT: [0, -1], DOWN: [-1, 0]};
 
-export const action = (actionType, block, field, direction) => {
+export const DIRECTION = {LEFT: 'LEFT', RIGHT: 'RIGHT', BOTTOM: 'BOTTOM'};
+
+const DIRECTION_MOVE = {LEFT: [0, 1], RIGHT: [0, -1], BOTTOM: [-1, 0]};
+
+export const transform = (transformType, block, field, direction) => {
   let newBlock = null;
-  switch (actionType) {
-    case ACTION.DROP:
-      newBlock = drop(block);
-      break;
-    case ACTION.ROTATE:
+  switch (transformType) {
+    case TRANSFORM.ROTATE:
       newBlock = rotate(block);
       break;
-    case ACTION.MOVE:
+    case TRANSFORM.MOVE:
       newBlock = move(block, direction);
       break;
-    case ACTION.HARD_DROP: {
-      let tempNewBlock = block;
-      while (!checkCollision(drop(tempNewBlock), field)) {
-        newBlock = drop(tempNewBlock);
-        tempNewBlock = newBlock;
-      }
-      break;
-    }
     default:
-      return {block, state: ACTION_STATE.ERROR};
+      return {block, state: TRANSFORM_STATE.ERROR};
   }
 
   const isCollision = checkCollision(newBlock, field);
   if (isCollision) {
-    return {message: 'collision', state: ACTION_STATE.FAIL};
+    return {message: 'collision', state: TRANSFORM_STATE.FAIL};
   }
 
-  return {block: newBlock, state: ACTION_STATE.SUCCESS};
-};
-
-const drop = (block) => {
-  const newBlock = deepCopy(block);
-  newBlock.position = sumArray(newBlock.position, DIRECTION.DOWN);
-  return newBlock;
+  return {block: newBlock, state: TRANSFORM_STATE.SUCCESS};
 };
 
 const rotate = (block) => {
@@ -66,9 +50,9 @@ const rotate = (block) => {
   return newBlock;
 };
 
-const move = (tetromino, direction) => {
-  const newBlock = deepCopy(tetromino);
-  newBlock.position = sumArray(tetromino.position, direction);
+const move = (block, direction) => {
+  const newBlock = deepCopy(block);
+  newBlock.position = sumArray(block.position, DIRECTION_MOVE[direction]);
   return newBlock;
 };
 

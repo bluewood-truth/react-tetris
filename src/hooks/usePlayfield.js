@@ -6,7 +6,11 @@ export const usePlayfield = () => {
 
   const lock = useCallback(
     (block, callback) => {
-      const [newField, clearLineCount] = clearLine(renderBlock(field, block));
+      const [newField, clearLineCount] = clearLine(
+        renderBlock(field, block, true)
+      );
+
+      console.log(newField);
       setField(newField);
       if (callback) callback(clearLineCount);
     },

@@ -1,20 +1,32 @@
-import {useCallback, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 
-export const useTimer = (callback, initialValue = 0) => {
+const SEC_PER_FRAME = 1000 / 60;
+
+export const useTimer = ({tick, isEnabled, initialValue = 0}) => {
   const timer = useRef(initialValue);
 
   const setTimer = useCallback(
     (dispatch) => {
       timer.current = dispatch(timer.current);
-      if (callback) callback(timer.current);
+      if (tick) tick(timer.current);
     },
-    [callback]
+    [tick]
   );
 
   const resetTimer = useCallback(() => {
-    timer.current = initialValue;
-    if (callback) callback(timer.current);
-  }, [callback, initialValue]);
+    setTimer(() => initialValue);
+  }, [initialValue, setTimer]);
 
-  return [setTimer, resetTimer];
+  useEffect(() => {
+    if (!isEnabled) return;
+
+    const id = setInterval(() => {
+      console.log(timer.current);
+      setTimer((prev) => prev + 1);
+    }, SEC_PER_FRAME);
+
+    return () => clearInterval(id);
+  }, [isEnabled, setTimer]);
+
+  return [resetTimer, setTimer];
 };

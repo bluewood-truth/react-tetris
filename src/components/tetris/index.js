@@ -1,5 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {ACTION, action, ACTION_STATE, DIRECTION} from 'src/core/action';
+import React, {useState} from 'react';
+import {
+  TRANSFORM,
+  transform,
+  TRANSFORM_STATE,
+  DIRECTION,
+} from 'src/core/transform';
 import {renderBlock} from 'src/core/render';
 import {useBlock} from 'src/hooks/useBlock';
 import {usePlayfield} from 'src/hooks/usePlayfield';
@@ -33,23 +38,28 @@ export const Tetris = () => {
   );
 };
 
+const DROP_DELAY = 48;
+const LOCK_DELAY = 60;
+
 const useGame = () => {
-  const {nextBlocks, popNextBlock} = useNextBlocks();
   const {field, lock, resetField} = usePlayfield();
   const {block, setBlock, setNewBlock} = useBlock(field);
-
   const [isPlaying, setPlaying] = useState(false);
-  const [setDropTimer, resetDropTimer] = useTimer((timer) => {
-    if (timer >= 48) {
-      drop();
-    }
-    if (timer >= 60) {
-      lock(block, (clearLineCount) => {
-        console.log('clear', clearLineCount, 'lines');
-        resetDropTimer();
-        setNewBlock(popNextBlock());
-      });
-    }
+  const {nextBlocks, popNextBlock} = useNextBlocks();
+  const [resetDropTimer] = useTimer({
+    isEnabled: isPlaying,
+    tick: (timer) => {
+      if (timer >= DROP_DELAY) {
+        drop();
+      }
+      if (timer >= LOCK_DELAY) {
+        lock(block, (clearLineCount) => {
+          console.log('clear', clearLineCount, 'lines');
+          resetDropTimer();
+          setNewBlock(popNextBlock());
+        });
+      }
+    },
   });
 
   const startGame = () => {
@@ -58,18 +68,10 @@ const useGame = () => {
     setPlaying(true);
   };
 
-  useEffect(() => {
-    if (!isPlaying) return;
-    const timer = setInterval(() => {
-      setDropTimer((prev) => prev + 1);
-    }, 1000 / 60);
-    return () => clearInterval(timer);
-  }, [isPlaying, setDropTimer]);
-
   const drop = () => {
-    const result = action(ACTION.DROP, block, field);
-
-    if (result.state === ACTION_STATE.SUCCESS) {
+    const result = transform(TRANSFORM.MOVE, block, field, DIRECTION.BOTTOM);
+    console.log(field);
+    if (result.state === TRANSFORM_STATE.SUCCESS) {
       console.log('drop');
       setBlock(result.block);
       resetDropTimer();
@@ -77,46 +79,54 @@ const useGame = () => {
   };
 
   const rotate = () => {
-    const result = action(ACTION.ROTATE, block, field);
+    const result = transform(TRANSFORM.ROTATE, block, field);
 
-    if (result.state === ACTION_STATE.SUCCESS) {
+    if (result.state === TRANSFORM_STATE.SUCCESS) {
       console.log('rotate');
       setBlock(result.block);
     }
   };
 
   const move = (direction) => {
-    const result = action(ACTION.MOVE, block, field, DIRECTION[direction]);
+    const result = transform(
+      TRANSFORM.MOVE,
+      block,
+      field,
+      DIRECTION[direction]
+    );
 
-    if (result.state === ACTION_STATE.SUCCESS) {
+    if (result.state === TRANSFORM_STATE.SUCCESS) {
       console.log('move:', direction);
       setBlock(result.block);
-      if (DIRECTION === 'DOWN') {
+      if (direction === DIRECTION.BOTTOM) {
         resetDropTimer();
       }
     }
   };
 
   const hardDrop = () => {
-    const result = action(ACTION.HARD_DROP, block, field);
-
-    if (result.state === ACTION_STATE.SUCCESS) {
-      console.log('hard drop');
-      lock(result.block, (clearLineCount) => {
-        console.log('clear', clearLineCount, 'lines');
-        resetDropTimer();
-        setNewBlock(popNextBlock());
-      });
+    let newBlock = block;
+    let result = transform(TRANSFORM.MOVE, block, field, DIRECTION.BOTTOM);
+    while (result.state === TRANSFORM_STATE.SUCCESS) {
+      newBlock = result.block;
+      result = transform(TRANSFORM.MOVE, result.block, field, DIRECTION.BOTTOM);
     }
+
+    console.log('hard drop');
+    lock(newBlock, (clearLineCount) => {
+      console.log('clear', clearLineCount, 'lines');
+      resetDropTimer();
+      setNewBlock(popNextBlock());
+    });
   };
 
   const handleKeyDown = (e) => {
     switch (e.key) {
       case 'ArrowLeft':
-        move('LEFT');
+        move(DIRECTION.LEFT);
         break;
       case 'ArrowRight':
-        move('RIGHT');
+        move(DIRECTION.RIGHT);
         break;
       case 'ArrowDown':
         drop();
@@ -128,7 +138,7 @@ const useGame = () => {
         hardDrop();
         break;
       case 'Escape':
-        setPlaying(prev => !prev);
+        setPlaying((prev) => !prev);
         break;
     }
   };
