@@ -20,9 +20,8 @@ export const createCell = (color, isEmpty = true, isLock = false) => {
 export const renderBlock = (field, block, isLock = false) => {
   if (!block) return field;
 
-  console.log(isLock);
   field = deepCopy(field);
-  block.cells.forEach((cellRow, row) => {
+  block && block.cells.forEach((cellRow, row) => {
     cellRow.map((cell, col) => {
       if (cell === 0) return;
 
