@@ -1,3 +1,13 @@
+@keyframes flash {
+  from {
+    background-color: white;
+    border: 4px solid white;
+  }
+
+  to {
+  }
+}
+
 .cell {
   width: 32px;
   height: 32px;
@@ -5,4 +15,8 @@
   border-left: 4px solid rgba(255 255 255/ 50%);
   border-right: 4px solid rgba(0 0 0/ 50%);
   border-bottom: 4px solid rgba(0 0 0/ 50%);
+}
+
+.cell[data-is-lock='true'] {
+  animation: flash 200ms forwards;
 }
