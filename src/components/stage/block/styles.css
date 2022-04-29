@@ -1,8 +1,7 @@
 .blockWrapper {
   position: absolute;
-  top: 0;
-  left: 0;
-  margin: 20px;
+  top: 1rem;
+  left: 1rem;
   width: 320px;
   height: 640px;
 }

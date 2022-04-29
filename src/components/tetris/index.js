@@ -1,49 +1,32 @@
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {Layout} from '../layout';
+import {Stage} from '../stage';
 import {PanelGroup, Panel, TimePanel} from '../panel';
-import {Field} from '../field';
 
+import {GAME_STATE, useGame} from 'src/hooks/useGame';
+import {useAutoFocus} from 'src/hooks/useAutoFocus';
+import {useFrame} from 'src/hooks/useFrame';
+import {useNextBlocks} from 'src/hooks/useNextBlocks';
+import {DIRECTION, transform, TRANSFORM_STATE} from 'src/core/transform';
+import {clearLine, isGameOver, renderBlock} from 'src/core/field';
 import {useBlock} from 'src/hooks/useBlock';
 import {useField} from 'src/hooks/useField';
-import {useFrame} from 'src/hooks/useFrame';
-import {GAME_STATE, useGame} from 'src/hooks/useGame';
-import {transform, TRANSFORM_STATE, DIRECTION} from 'src/core/transform';
-import {clearLine, isGameOver, renderBlock} from 'src/core/field';
-import {Block} from '../block';
 
 export const Tetris = ({gameMode}) => {
-  const {
-    score,
-    lines,
-    lineClearCallback,
-    gameState,
-    setStart,
-    setPause,
-    setGameOver,
-    // setFinish,
-  } = useGame();
-  const {nextBlocks, block, field, handleKeyDown, startGame} = useTetris(
-    gameMode,
-    lineClearCallback,
-    gameState,
-    setStart,
-    setPause,
-    setGameOver
-  );
-
-  const screenRef = useRef(null);
-
-  useEffect(() => {
-    if (!screenRef) return;
-    screenRef.current.focus();
-    startGame();
-  }, [startGame]);
+  const [time, setTime] = useState(0);
+  const {field, block, nextBlocks, gameState, score, lines, handleKeyDown} =
+    useTetris(gameMode);
+  const [ref] = useAutoFocus();
 
   return (
-    <Layout ref={screenRef} onKeyDown={handleKeyDown}>
-      <Field field={field} />
-      <Block block={block} />
+    <Layout ref={ref} onKeyDown={handleKeyDown}>
+      <Stage
+        field={field}
+        block={block}
+        gameState={gameState}
+        gameResult={{score, lines, time}}
+      />
       <PanelGroup>
         <Panel label='NEXT'>
           {nextBlocks.current.slice(0, 5).map((next, i) => (
@@ -52,7 +35,7 @@ export const Tetris = ({gameMode}) => {
         </Panel>
         <Panel label='SCORE' value={score} />
         <Panel label='LINES' value={lines} />
-        <TimePanel enabled={gameState === GAME_STATE.PLAYING} />
+        <TimePanel gameState={gameState} setTime={setTime} />
       </PanelGroup>
     </Layout>
   );
@@ -61,24 +44,18 @@ export const Tetris = ({gameMode}) => {
 const DROP_DELAY = 48;
 const LOCK_DELAY = 60;
 
-const useTetris = (
-  gameMode,
-  lineClearCallback,
-  gameState,
-  setStart,
-  setPause,
-  setGameOver
-) => {
+const useTetris = (gameMode) => {
+  const [clearLineCount, setClearLineCount] = useState(0);
   const {field, setField, resetField} = useField();
-  const {block, setBlock, setNewBlock, nextBlocks, resetNextBlocks} =
-    useBlock();
-
-  useEffect(() => {
-    console.log('field');
-  }, [field]);
+  const {block, updateBlock, setNewBlock} = useBlock();
+  const {nextBlocks, resetNextBlocks, popNextBlock} = useNextBlocks();
+  const {gameState, score, lines, start, pause, gameOver, finish} = useGame(
+    gameMode,
+    clearLineCount
+  );
 
   const {resetFrame: resetDropTimer} = useFrame({
-    isEnabled: gameState === GAME_STATE.PLAYING,
+    enabled: gameState === GAME_STATE.PLAYING,
     tick: (currentFrame) => {
       if (currentFrame >= DROP_DELAY) {
         drop();
@@ -89,42 +66,10 @@ const useTetris = (
     },
   });
 
-  const startGame = useCallback(() => {
-    console.log('start');
-    resetField();
-    resetNextBlocks();
-    setNewBlock();
-    setStart();
-  }, [resetField, resetNextBlocks, setNewBlock, setStart]);
-
-  const pauseGame = () => {
-    setPause();
-  };
-
-  const lock = (block) => {
-    if (isGameOver(block)) {
-      console.log('gameover');
-      setField(renderBlock(field, block, true));
-      setGameOver();
-      return;
-    }
-
-    const [newField, clearLineCount] = clearLine(
-      renderBlock(field, block, true)
-    );
-
-    setField(newField);
-    lineClearCallback(clearLineCount);
-    resetDropTimer();
-
-    setNewBlock();
-  };
-
   const drop = () => {
     const result = transform.move(block, field, DIRECTION.BOTTOM);
     if (result.state === TRANSFORM_STATE.SUCCESS) {
-      console.log('drop');
-      setBlock(result.block);
+      updateBlock(result.block);
       resetDropTimer();
     }
   };
@@ -132,8 +77,7 @@ const useTetris = (
   const rotate = () => {
     const result = transform.rotate(block, field);
     if (result.state === TRANSFORM_STATE.SUCCESS) {
-      console.log('rotate');
-      setBlock(result.block);
+      updateBlock(result.block);
     } else {
       console.log(result.message);
     }
@@ -143,8 +87,7 @@ const useTetris = (
     const result = transform.move(block, field, DIRECTION[direction]);
 
     if (result.state === TRANSFORM_STATE.SUCCESS) {
-      console.log('move:', direction);
-      setBlock(result.block);
+      updateBlock(result.block);
       if (direction === DIRECTION.BOTTOM) {
         resetDropTimer();
       }
@@ -159,41 +102,62 @@ const useTetris = (
       result = transform.move(result.block, field, DIRECTION.BOTTOM);
     }
 
-    console.log('hard drop');
     lock(newBlock);
   };
 
-  const {handleKeyDown} = useKeyboard({
-    isEnabled: gameState === GAME_STATE.PLAYING,
-    move,
-    drop,
-    rotate,
-    hardDrop,
-    startGame,
-    pauseGame,
-  });
+  useEffect(() => {
+    if (gameState === GAME_STATE.NONE) {
+      startGame();
+    }
+  }, [gameState, startGame]);
 
-  return {
-    handleKeyDown,
-    startGame,
-    nextBlocks,
-    block,
-    field,
+  const startGame = useCallback(() => {
+    resetDropTimer();
+    resetField();
+    resetNextBlocks();
+    setNewBlock(popNextBlock());
+    start();
+  }, [
+    resetDropTimer,
+    resetField,
+    resetNextBlocks,
+    setNewBlock,
+    popNextBlock,
+    start,
+  ]);
+
+  const lock = (block) => {
+    const [newField, clearLineCount] = clearLine(
+      renderBlock(field, block, true)
+    );
+
+    setClearLineCount(clearLineCount);
+
+    setField(newField);
+    if (isGameOver(newField)) {
+      gameOver();
+      return;
+    } else if (gameMode === '40LINES' && lines >= 40) {
+      finish();
+    }
+
+    next();
   };
-};
 
-const useKeyboard = ({
-  isEnabled,
-  move,
-  drop,
-  rotate,
-  hardDrop,
-  startGame,
-  pauseGame,
-}) => {
+  const next = () => {
+    setNewBlock(popNextBlock());
+    resetDropTimer();
+  };
+
   const handleKeyDown = (e) => {
-    if (!isEnabled) return;
-    switch (e.key.toLowerCase()) {
+    const key = e.key.toLowerCase();
+    if (key === 'r') {
+      startGame();
+      return;
+    }
+
+    if (gameState !== GAME_STATE.PLAYING) return;
+    switch (key) {
       case 'arrowleft':
         move(DIRECTION.LEFT);
         break;
@@ -210,12 +174,19 @@ const useKeyboard = ({
         hardDrop();
         break;
       case 'p':
-        pauseGame();
+        pause();
         break;
-      case 'r':
-        startGame();
     }
   };
 
-  return {handleKeyDown};
+  return {
+    startGame,
+    field,
+    block,
+    nextBlocks,
+    gameState,
+    score,
+    lines,
+    handleKeyDown,
+  };
 };

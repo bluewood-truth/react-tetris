@@ -1,0 +1,29 @@
+.stage {
+  padding: 1rem;
+  border: 4px solid white;
+  border-radius: 4px;
+  position: relative;
+}
+
+.popupWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup {
+  width: 300px;
+  border: 4px solid white;
+  background-color: black;
+  border-radius: 4px;
+  padding: 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 1rem;
+}

@@ -1,7 +1,8 @@
 import {deepCopy, sumArray} from 'src/helpers/object';
 
 export const FIELD_WIDTH = 10;
-export const FIELD_HEIGHT = 20;
+export const FIELD_HEIGHT = 24;
+const DEADLINE = 20;
 
 export const createField = (width = FIELD_WIDTH, height = FIELD_HEIGHT) => {
   return Array(height)
@@ -51,15 +52,6 @@ export const clearLine = (field) => {
   return [newField, clearLineCount];
 };
 
-export const isGameOver = (block) => {
-  let result = false;
-  block.cells.forEach((cellRow, row) => {
-    cellRow.map((cell, col) => {
-      if (cell === 0) return;
-      const [fieldRow] = sumArray([row, col], block.position);
-      if (fieldRow >= FIELD_HEIGHT) result = true;
-    });
-  });
-
-  return result;
+export const isGameOver = (field) => {
+  return field[DEADLINE].some((cell) => !cell.isEmpty);
 };

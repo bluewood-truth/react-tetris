@@ -1,0 +1,43 @@
+.title {
+  display: flex;
+  flex-direction: column;
+  row-gap: 24px;
+  align-items: center;
+  padding-bottom: 48px;
+}
+
+.titleLabel {
+  font-size: 48px;
+  text-shadow: -1px -1px white;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  row-gap: 24px;
+  height: 100px;
+}
+
+.button {
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.button:focus {
+  outline: none;
+}
+
+.button::before {
+  content: '> ';
+  opacity: 0;
+}
+
+.button:hover::before,
+.button:focus::before {
+  opacity: 1;
+}

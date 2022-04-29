@@ -2,7 +2,7 @@ import {useCallback, useEffect, useRef} from 'react';
 
 const MS_PER_FRAME = 1000 / 60;
 
-export const useFrame = ({tick, isEnabled, initialValue = 0}) => {
+export const useFrame = ({tick, enabled, initialValue = 0}) => {
   const frame = useRef(initialValue);
 
   const setFrame = useCallback(
@@ -18,14 +18,14 @@ export const useFrame = ({tick, isEnabled, initialValue = 0}) => {
   }, [initialValue, setFrame]);
 
   useEffect(() => {
-    if (!isEnabled) return;
+    if (!enabled) return;
 
     const id = setInterval(() => {
       setFrame((prev) => prev + 1);
     }, MS_PER_FRAME);
 
     return () => clearInterval(id);
-  }, [isEnabled, setFrame]);
+  }, [enabled, setFrame]);
 
   return {resetFrame, setFrame, frame: frame.current};
 };

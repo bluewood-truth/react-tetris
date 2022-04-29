@@ -1,4 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {secondToMMSS} from 'src/helpers/time';
+import {GAME_STATE} from 'src/hooks/useGame';
 import styles from './styles.css';
 
 export const Panel = React.memo(({label, value, children}) => {
@@ -17,24 +19,27 @@ export const PanelGroup = ({children}) => {
   return <div className={styles.panelGroup}>{children}</div>;
 };
 
-export const TimePanel = React.memo(({enabled, reset}) => {
-  const {mmss} = useTime(enabled, reset);
-  return <Panel label='TIME' value={mmss} />;
+export const TimePanel = React.memo(({gameState, setTime}) => {
+  const {sec} = useTime(gameState, setTime);
+  return <Panel label='TIME' value={secondToMMSS(sec)} />;
 });
 
 TimePanel.displayName = 'TimePanel';
 
-const useTime = (isEnabled, isReset) => {
+const useTime = (gameState, setTime) => {
   const milliSec = useRef(0);
   const [sec, setSec] = useState(0);
 
   useEffect(() => {
-    setSec(0);
-    milliSec.current = 0;
-  }, [isReset]);
+    if (gameState === GAME_STATE.FINISH || gameState === GAME_STATE.GAME_OVER) {
+      setTime(milliSec.current);
+      setSec(0);
+      milliSec.current = 0;
+    }
+  }, [gameState, setTime]);
 
   useEffect(() => {
-    if (!isEnabled) return;
+    if (gameState !== GAME_STATE.PLAYING) return;
     const timer = setInterval(() => {
       milliSec.current = milliSec.current + 10;
       if (milliSec.current % 1000 === 0) {
@@ -43,17 +48,7 @@ const useTime = (isEnabled, isReset) => {
     }, 10);
 
     return () => clearInterval(timer);
-  }, [isEnabled]);
+  }, [gameState]);
 
-  const mmss = `
-    ${String(Math.round(sec / 60)).padStart(2, '0')}:${String(
-    sec % 60
-  ).padStart(2, '0')}
-  `;
-
-  const mmssfff = `
-    ${mmss}.${String(milliSec / 10).padStart(3, '0')}
-  `;
-
-  return {mmss, mmssfff};
+  return {sec};
 };
