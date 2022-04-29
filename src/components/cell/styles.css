@@ -20,3 +20,9 @@
 .cell[data-is-lock='true'] {
   animation: flash 200ms forwards;
 }
+
+.row {
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+}

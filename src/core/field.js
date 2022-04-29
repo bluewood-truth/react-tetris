@@ -21,16 +21,17 @@ export const renderBlock = (field, block, isLock = false) => {
   if (!block) return field;
 
   field = deepCopy(field);
-  block && block.cells.forEach((cellRow, row) => {
-    cellRow.map((cell, col) => {
-      if (cell === 0) return;
+  block &&
+    block.cells.forEach((cellRow, row) => {
+      cellRow.map((cell, col) => {
+        if (cell === 0) return;
 
-      const [fieldRow, fieldCol] = sumArray([row, col], block.position);
+        const [fieldRow, fieldCol] = sumArray([row, col], block.position);
 
-      if (fieldRow >= FIELD_HEIGHT || fieldCol >= FIELD_WIDTH) return;
-      field[fieldRow][fieldCol] = createCell(block.color, false, isLock);
+        if (fieldRow >= FIELD_HEIGHT || fieldCol >= FIELD_WIDTH) return;
+        field[fieldRow][fieldCol] = createCell(block.color, false, isLock);
+      });
     });
-  });
   return field;
 };
 
@@ -48,4 +49,17 @@ export const clearLine = (field) => {
     ...createField(FIELD_WIDTH, clearLineCount),
   ];
   return [newField, clearLineCount];
+};
+
+export const isGameOver = (block) => {
+  let result = false;
+  block.cells.forEach((cellRow, row) => {
+    cellRow.map((cell, col) => {
+      if (cell === 0) return;
+      const [fieldRow] = sumArray([row, col], block.position);
+      if (fieldRow >= FIELD_HEIGHT) result = true;
+    });
+  });
+
+  return result;
 };

@@ -1,15 +1,10 @@
 import React from 'react';
-import {Cell} from '../cell';
+import {Row} from '../cell';
 import styles from './styles.css';
 
-export const Field = React.forwardRef(({field, onKeyDown}, ref) => {
+export const Field = React.memo(({field}) => {
   return (
-    <div
-      className={styles.playfield}
-      tabIndex={0}
-      onKeyDown={onKeyDown}
-      ref={ref}
-    >
+    <div className={styles.playfield}>
       <div className={styles.playfieldInner}>
         {field.map((row, i) => (
           <Row key={i} row={row} />
@@ -20,18 +15,3 @@ export const Field = React.forwardRef(({field, onKeyDown}, ref) => {
 });
 
 Field.displayName = 'Field';
-
-export const Row = ({row}) => {
-  return (
-    <div className={styles.row}>
-      {row.map((cell, j) => (
-        <Cell
-          key={j}
-          color={cell.color}
-          isEmpty={cell.isEmpty}
-          isLock={cell.isLock}
-        />
-      ))}
-    </div>
-  );
-};
