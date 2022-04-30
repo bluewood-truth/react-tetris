@@ -31,7 +31,8 @@ const useTime = (gameState, setTime) => {
   const [sec, setSec] = useState(0);
 
   useEffect(() => {
-    if (gameState === GAME_STATE.FINISH || gameState === GAME_STATE.GAME_OVER) {
+    if (gameState === GAME_STATE.PAUSE) return;
+    if (gameState !== GAME_STATE.PLAYING) {
       setTime(milliSec.current);
       setSec(0);
       milliSec.current = 0;

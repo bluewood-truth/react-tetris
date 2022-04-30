@@ -1,4 +1,5 @@
 import {useCallback, useEffect, useState} from 'react';
+import {useAudio} from './useAudio';
 
 const SCORE_PER_LINES = [0, 40, 100, 300, 1200];
 export const GAME_STATE = {
@@ -13,6 +14,7 @@ export const useGame = (gameMode, clearLineCount) => {
   const [gameState, setGameState] = useState(GAME_STATE.NONE);
   const [score, setScore] = useState(0);
   const [lines, setLines] = useState(0);
+  const [playFinishSound] = useAudio('/se_finish.wav');
 
   useEffect(() => {
     if (clearLineCount > 0) {
@@ -24,8 +26,9 @@ export const useGame = (gameMode, clearLineCount) => {
   useEffect(() => {
     if (gameMode === '40LINES' && lines >= 40) {
       setGameState(GAME_STATE.FINISH);
+      playFinishSound();
     }
-  }, [gameMode, lines]);
+  }, [gameMode, lines, playFinishSound]);
 
   const start = useCallback(() => {
     setGameState(GAME_STATE.PLAYING);
@@ -45,9 +48,9 @@ export const useGame = (gameMode, clearLineCount) => {
     setGameState(GAME_STATE.GAME_OVER);
   };
 
-  const finish = () => {
-    setGameState(GAME_STATE.FINISH);
-  };
+  const reset = () => {
+    setGameState(GAME_STATE.NONE);
+  }
 
   return {
     gameState,
@@ -56,6 +59,6 @@ export const useGame = (gameMode, clearLineCount) => {
     start,
     pause,
     gameOver,
-    finish,
+    reset,
   };
 };

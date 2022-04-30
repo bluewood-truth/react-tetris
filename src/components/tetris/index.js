@@ -3,25 +3,34 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {Layout} from '../layout';
 import {Stage} from '../stage';
 import {PanelGroup, Panel, TimePanel} from '../panel';
+import {Tetromino} from '../tetromino';
 
 import {GAME_STATE, useGame} from 'src/hooks/useGame';
-import {useAutoFocus} from 'src/hooks/useAutoFocus';
-import {useFrame} from 'src/hooks/useFrame';
-import {useNextBlocks} from 'src/hooks/useNextBlocks';
-import {DIRECTION, transform, TRANSFORM_STATE} from 'src/core/transform';
-import {clearLine, isGameOver, renderBlock} from 'src/core/field';
 import {useBlock} from 'src/hooks/useBlock';
 import {useField} from 'src/hooks/useField';
-import {Tetromino} from '../tetromino';
+import {useFrame} from 'src/hooks/useFrame';
+import {useNextBlocks} from 'src/hooks/useNextBlocks';
+import {useAutoFocus} from 'src/hooks/useAutoFocus';
+import {useAudio} from 'src/hooks/useAudio';
+import {DIRECTION, transform, TRANSFORM_STATE} from 'src/core/transform';
+import {clearLine, isGameOver, renderBlock} from 'src/core/field';
 
 export const Tetris = ({gameMode}) => {
   const [time, setTime] = useState(0);
-  const {field, block, nextBlocks, gameState, score, lines, handleKeyDown} =
-    useTetris(gameMode);
+  const {
+    field,
+    block,
+    nextBlocks,
+    gameState,
+    score,
+    lines,
+    handleKeyDown,
+    handleBlur,
+  } = useTetris(gameMode);
   const [ref] = useAutoFocus();
 
   return (
-    <Layout ref={ref} onKeyDown={handleKeyDown}>
+    <Layout ref={ref} onKeyDown={handleKeyDown} onBlur={handleBlur}>
       <PanelGroup>
         <Panel label='SCORE' value={score} />
         <Panel label='LINES' value={lines} />
@@ -36,7 +45,7 @@ export const Tetris = ({gameMode}) => {
       <PanelGroup>
         <Panel label='NEXT' align='center'>
           {nextBlocks.current.slice(0, 5).map((next, i) => (
-            <Tetromino key={i} name={next} />
+            <Tetromino key={i} name={next} ignoreEmptyLines />
           ))}
         </Panel>
       </PanelGroup>
@@ -52,12 +61,20 @@ const useTetris = (gameMode) => {
   const {field, setField, resetField} = useField();
   const {block, updateBlock, setNewBlock} = useBlock();
   const {nextBlocks, resetNextBlocks, popNextBlock} = useNextBlocks();
-  const {gameState, score, lines, start, pause, gameOver, finish} = useGame(
+  const {gameState, score, lines, start, pause, gameOver, reset} = useGame(
     gameMode,
     clearLineCount
   );
 
-  const {resetFrame: resetDropTimer} = useFrame({
+  const [playBgm, stopBgm] = useAudio('/bgm.mp3', {loop: true, volume: 0.25});
+  const [playGameOverSound] = useAudio('/se_game_over.wav');
+  const [playMoveSound] = useAudio('/se_move.wav');
+  const [playRotateSound] = useAudio('/se_rotate.wav');
+  const [playLockSound] = useAudio('/se_lock.wav');
+  const [playTouchWallSound] = useAudio('/se_touch_wall.wav');
+  const [playClearLineSound] = useAudio('/se_clear_line.wav');
+
+  const {resetFrame: resetTimer} = useFrame({
     enabled: gameState === GAME_STATE.PLAYING,
     tick: (currentFrame) => {
       if (currentFrame >= DROP_DELAY) {
@@ -73,7 +90,7 @@ const useTetris = (gameMode) => {
     const result = transform.move(block, field, DIRECTION.BOTTOM);
     if (result.state === TRANSFORM_STATE.SUCCESS) {
       updateBlock(result.block);
-      resetDropTimer();
+      resetTimer();
     }
   };
 
@@ -81,8 +98,10 @@ const useTetris = (gameMode) => {
     const result = transform.rotate(block, field);
     if (result.state === TRANSFORM_STATE.SUCCESS) {
       updateBlock(result.block);
+      playRotateSound();
     } else {
       console.log(result.message);
+      playTouchWallSound();
     }
   };
 
@@ -91,9 +110,12 @@ const useTetris = (gameMode) => {
 
     if (result.state === TRANSFORM_STATE.SUCCESS) {
       updateBlock(result.block);
+      playMoveSound();
       if (direction === DIRECTION.BOTTOM) {
-        resetDropTimer();
+        resetTimer();
       }
+    } else {
+      playTouchWallSound();
     }
   };
 
@@ -108,78 +130,98 @@ const useTetris = (gameMode) => {
     lock(newBlock);
   };
 
-  useEffect(() => {
-    if (gameState === GAME_STATE.NONE) {
-      startGame();
-    }
-  }, [gameState, startGame]);
-
-  const startGame = useCallback(() => {
-    resetDropTimer();
-    resetField();
-    resetNextBlocks();
-    setNewBlock(popNextBlock());
-    start();
-  }, [
-    resetDropTimer,
-    resetField,
-    resetNextBlocks,
-    setNewBlock,
-    popNextBlock,
-    start,
-  ]);
-
   const lock = (block) => {
     const [newField, clearLineCount] = clearLine(
       renderBlock(field, block, true)
     );
 
     setClearLineCount(clearLineCount);
+    if (clearLineCount > 0) {
+      playClearLineSound();
+    }
 
     setField(newField);
     if (isGameOver(newField)) {
       gameOver();
+      playGameOverSound();
       return;
-    } else if (gameMode === '40LINES' && lines >= 40) {
-      finish();
     }
 
+    playLockSound();
     next();
   };
 
   const next = () => {
     setNewBlock(popNextBlock());
-    resetDropTimer();
+    resetTimer();
   };
+
+  const startGame = useCallback(() => {
+    resetTimer();
+    resetField();
+    resetNextBlocks();
+    setNewBlock(popNextBlock());
+    start();
+    playBgm();
+  }, [
+    resetTimer,
+    resetField,
+    resetNextBlocks,
+    setNewBlock,
+    popNextBlock,
+    start,
+    playBgm,
+  ]);
+
+  useEffect(() => {
+    if (gameState === GAME_STATE.NONE) {
+      startGame();
+    }
+  }, [gameState, startGame]);
+
+  useEffect(() => {
+    if (gameState === GAME_STATE.GAME_OVER || gameState === GAME_STATE.FINISH) {
+      stopBgm();
+    }
+  }, [gameState, stopBgm]);
 
   const handleKeyDown = (e) => {
     const key = e.key.toLowerCase();
     if (key === 'r') {
-      startGame();
+      reset();
       return;
     }
 
-    if (gameState !== GAME_STATE.PLAYING) return;
-    switch (key) {
-      case 'arrowleft':
-        move(DIRECTION.LEFT);
-        break;
-      case 'arrowright':
-        move(DIRECTION.RIGHT);
-        break;
-      case 'arrowdown':
-        drop();
-        break;
-      case 'arrowup':
-        rotate();
-        break;
-      case ' ':
-        hardDrop();
-        break;
-      case 'p':
+    if (gameState === GAME_STATE.PLAYING) {
+      switch (key) {
+        case 'arrowleft':
+          move(DIRECTION.LEFT);
+          break;
+        case 'arrowright':
+          move(DIRECTION.RIGHT);
+          break;
+        case 'arrowdown':
+          move(DIRECTION.BOTTOM);
+          break;
+        case 'arrowup':
+          rotate();
+          break;
+        case ' ':
+          hardDrop();
+          break;
+        case 'p':
+          pause();
+          break;
+      }
+    } else if (gameState === GAME_STATE.PAUSE) {
+      if (key === 'p') {
         pause();
-        break;
+      }
     }
+  };
+
+  const handleBlur = () => {
+    if (gameState === GAME_STATE.PLAYING) pause();
   };
 
   return {
@@ -191,5 +233,6 @@ const useTetris = (gameMode) => {
     score,
     lines,
     handleKeyDown,
+    handleBlur,
   };
 };

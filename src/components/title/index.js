@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useAudio} from 'src/hooks/useAudio';
 import styles from './styles.css';
 
 export const Title = ({setGameMode}) => {
@@ -16,31 +17,41 @@ export const Title = ({setGameMode}) => {
       </h1>
       {step === 1 && (
         <div className={styles.menu}>
-          <button className={styles.button} onClick={() => setStep(2)}>
-            START
-          </button>
+          <MenuButton onClick={() => setStep(2)} label='START' />
         </div>
       )}
       {step === 2 && (
         <div className={styles.menu}>
-          <button
-            className={styles.button}
+          <MenuButton
             onClick={() => {
               setGameMode('40LINES');
             }}
-          >
-            40-LINES SPRINT
-          </button>
-          <button
-            className={styles.button}
+            label='40-LINES SPRINT'
+          />
+          <MenuButton
             onClick={() => {
               setGameMode('MARATHON');
             }}
-          >
-            MARATHON
-          </button>
+            label='MARATHON'
+          />
         </div>
       )}
     </div>
+  );
+};
+
+const MenuButton = ({onClick, label}) => {
+  const [playClickSound] = useAudio('/se_click.wav');
+
+  return (
+    <button
+      className={styles.button}
+      onClick={() => {
+        playClickSound();
+        onClick();
+      }}
+    >
+      {label}
+    </button>
   );
 };
