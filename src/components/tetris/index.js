@@ -12,6 +12,7 @@ import {DIRECTION, transform, TRANSFORM_STATE} from 'src/core/transform';
 import {clearLine, isGameOver, renderBlock} from 'src/core/field';
 import {useBlock} from 'src/hooks/useBlock';
 import {useField} from 'src/hooks/useField';
+import {Tetromino} from '../tetromino';
 
 export const Tetris = ({gameMode}) => {
   const [time, setTime] = useState(0);
@@ -21,6 +22,11 @@ export const Tetris = ({gameMode}) => {
 
   return (
     <Layout ref={ref} onKeyDown={handleKeyDown}>
+      <PanelGroup>
+        <Panel label='SCORE' value={score} />
+        <Panel label='LINES' value={lines} />
+        <TimePanel gameState={gameState} setTime={setTime} />
+      </PanelGroup>
       <Stage
         field={field}
         block={block}
@@ -28,14 +34,11 @@ export const Tetris = ({gameMode}) => {
         gameResult={{score, lines, time}}
       />
       <PanelGroup>
-        <Panel label='NEXT'>
+        <Panel label='NEXT' align='center'>
           {nextBlocks.current.slice(0, 5).map((next, i) => (
-            <p key={i}>{next}</p>
+            <Tetromino key={i} name={next} />
           ))}
         </Panel>
-        <Panel label='SCORE' value={score} />
-        <Panel label='LINES' value={lines} />
-        <TimePanel gameState={gameState} setTime={setTime} />
       </PanelGroup>
     </Layout>
   );

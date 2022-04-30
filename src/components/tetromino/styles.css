@@ -1,0 +1,13 @@
+.tetromino {
+  display: flex;
+  flex-direction: column-reverse;
+  height: 64px;
+  justify-content: center;
+  transform: scale(80%);
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+}

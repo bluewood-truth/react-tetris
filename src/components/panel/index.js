@@ -3,9 +3,9 @@ import {secondToMMSS} from 'src/helpers/time';
 import {GAME_STATE} from 'src/hooks/useGame';
 import styles from './styles.css';
 
-export const Panel = React.memo(({label, value, children}) => {
+export const Panel = React.memo(({label, value, align='right', children}) => {
   return (
-    <div className={styles.panel}>
+    <div className={styles.panel} style={{alignItems: align}}>
       {label && <span className={styles.label}>{label}</span>}
       {value && <span>{value}</span>}
       {children}
