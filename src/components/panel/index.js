@@ -1,9 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {GAME_STATE} from 'src/hooks/useGameState';
 import {secondToMMSS} from 'src/helpers/time';
-import {GAME_STATE} from 'src/hooks/useGame';
 import styles from './styles.css';
 
-export const Panel = React.memo(({label, value, align='right', children}) => {
+export const Panel = React.memo(({label, value, align = 'right', children}) => {
   return (
     <div className={styles.panel} style={{alignItems: align}}>
       {label && <span className={styles.label}>{label}</span>}
@@ -31,9 +31,11 @@ const useTime = (gameState, setTime) => {
   const [sec, setSec] = useState(0);
 
   useEffect(() => {
-    if (gameState === GAME_STATE.PAUSE) return;
-    if (gameState !== GAME_STATE.PLAYING) {
+    if (gameState === GAME_STATE.FINISH || gameState === GAME_STATE.GAME_OVER) {
       setTime(milliSec.current);
+    }
+
+    if (gameState === GAME_STATE.NONE) {
       setSec(0);
       milliSec.current = 0;
     }

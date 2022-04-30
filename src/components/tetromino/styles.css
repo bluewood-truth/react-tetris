@@ -1,9 +1,7 @@
 .tetromino {
   display: flex;
   flex-direction: column-reverse;
-  height: 64px;
   justify-content: center;
-  transform: scale(80%);
 }
 
 .row {

@@ -23,8 +23,8 @@ export const useAudio = (url, option = {}) => {
     }
   }, [autoPlay, loop, url, volume]);
 
-  const play = useCallback(() => {
-    stop();
+  const play = useCallback((stopPrevPlay) => {
+    if (stopPrevPlay) stop();
     audio.current.play();
   }, [stop]);
 

@@ -1,6 +1,12 @@
 import React, {useState} from 'react';
 import {useAudio} from 'src/hooks/useAudio';
+import {GAME_MODE} from 'src/hooks/useGameState';
 import styles from './styles.css';
+
+const gameModeLabels = {
+  [GAME_MODE.SPRINT]: '40-LINES SPRINT',
+  [GAME_MODE.FREE]: 'FREE',
+};
 
 export const Title = ({setGameMode}) => {
   const [step, setStep] = useState(1);
@@ -22,18 +28,15 @@ export const Title = ({setGameMode}) => {
       )}
       {step === 2 && (
         <div className={styles.menu}>
-          <MenuButton
-            onClick={() => {
-              setGameMode('40LINES');
-            }}
-            label='40-LINES SPRINT'
-          />
-          <MenuButton
-            onClick={() => {
-              setGameMode('MARATHON');
-            }}
-            label='MARATHON'
-          />
+          {Object.values(GAME_MODE).map((gameMode, i) => (
+            <MenuButton
+              key={i}
+              onClick={() => {
+                setGameMode(gameMode);
+              }}
+              label={gameModeLabels[gameMode]}
+            />
+          ))}
         </div>
       )}
     </div>

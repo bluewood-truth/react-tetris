@@ -4,18 +4,8 @@
   left: 1rem;
   width: 320px;
   height: 640px;
-}
 
-.block {
-  position: absolute;
-  bottom: 0;
-  right: 0;
   display: flex;
-  flex-direction: column-reverse;
-}
-
-.blockRow {
-  width: 100%;
-  display: flex;
-  flex-direction: row-reverse;
+  align-items: end;
+  justify-content: end;
 }

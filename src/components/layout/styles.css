@@ -4,8 +4,6 @@
   align-items: top;
   margin: auto auto;
   column-gap: 1.5rem;
-
-  position: relative;
 }
 
 .layout:focus {
