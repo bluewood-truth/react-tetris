@@ -18,6 +18,12 @@ export const Stage = ({field, block, gameState, gameResult}) => {
             <div>PRESS R TO RETRY</div>
           </div>
         )}
+        {gameState === GAME_STATE.PAUSE && (
+          <div className={styles.popup}>
+            <div>PAUSE</div>
+            <div>PRESS P TO PLAY</div>
+          </div>
+        )}
         {gameState === GAME_STATE.FINISH && (
           <div className={styles.popup}>
             <div>FINISH!</div>
