@@ -57,18 +57,22 @@ export const Tetris = ({gameMode}) => {
   );
 };
 
-const DROP_DELAY = 48;
-const LOCK_DELAY = 60;
-
 const useTetris = (gameMode) => {
   const [clearLineCount, setClearLineCount] = useState(0);
   const {field, setField, resetField} = useField();
   const {block, updateBlock, setNewBlock} = useBlock();
   const {nextBlocks, resetNextBlocks, popNextBlock} = useNextBlocks();
-  const {gameState, score, lines, start, pause, gameOver, reset} = useGameState(
-    gameMode,
-    clearLineCount
-  );
+  const {
+    gameState,
+    score,
+    lines,
+    start,
+    pause,
+    gameOver,
+    reset,
+    dropDelay,
+    lockDelay,
+  } = useGameState(gameMode, clearLineCount);
 
   const [playBgm, stopBgm] = useAudio('/bgm.mp3', {loop: true, volume: 0.25});
   const [playFinishSound] = useAudio('/se_finish.wav');
@@ -82,10 +86,10 @@ const useTetris = (gameMode) => {
   const {resetFrame: resetTimer} = useFrame({
     enabled: gameState === GAME_STATE.PLAYING,
     tick: (currentFrame) => {
-      if (currentFrame >= DROP_DELAY) {
+      if (currentFrame >= dropDelay) {
         drop();
       }
-      if (currentFrame >= LOCK_DELAY) {
+      if (currentFrame >= lockDelay) {
         lock(block);
       }
     },

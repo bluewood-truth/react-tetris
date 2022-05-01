@@ -5,6 +5,7 @@ import styles from './styles.css';
 
 const gameModeLabels = {
   [GAME_MODE.SPRINT]: '40-LINES SPRINT',
+  [GAME_MODE.MARATHON]: '100-LINES MARATHON',
   [GAME_MODE.FREE]: 'FREE',
 };
 
