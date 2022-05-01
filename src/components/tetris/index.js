@@ -58,7 +58,6 @@ export const Tetris = ({gameMode}) => {
 };
 
 const useTetris = (gameMode) => {
-  const [clearLineCount, setClearLineCount] = useState(0);
   const {field, setField, resetField} = useField();
   const {block, updateBlock, setNewBlock} = useBlock();
   const {nextBlocks, resetNextBlocks, popNextBlock} = useNextBlocks();
@@ -72,7 +71,8 @@ const useTetris = (gameMode) => {
     reset,
     dropDelay,
     lockDelay,
-  } = useGameState(gameMode, clearLineCount);
+    setClearLineCount,
+  } = useGameState(gameMode);
 
   const [playBgm, stopBgm] = useAudio('/bgm.mp3', {loop: true, volume: 0.25});
   const [playFinishSound] = useAudio('/se_finish.wav');

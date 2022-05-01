@@ -25,11 +25,12 @@ const FINISH_CONDITION = {
 const DROP_DELAY = [48, 30, 22, 16, 12, 9, 7, 5, 4, 3];
 const MIN_LOCK_DELAY = 15;
 
-export const useGameState = (gameMode, clearLineCount) => {
+export const useGameState = (gameMode) => {
   const [gameState, setGameState] = useState(GAME_STATE.NONE);
   const [score, setScore] = useState(0);
   const [lines, setLines] = useState(0);
   const [dropDelay, setDropDelay] = useState(DROP_DELAY[0]);
+  const [clearLineCount, setClearLineCount] = useState(0);
 
   const lockDelay = useMemo(
     () => Math.max(dropDelay * 1.25, MIN_LOCK_DELAY),
@@ -42,6 +43,7 @@ export const useGameState = (gameMode, clearLineCount) => {
     if (clearLineCount > 0) {
       setScore((prev) => prev + SCORE_PER_LINES[clearLineCount] * (level + 1));
       setLines((prev) => prev + clearLineCount);
+      setClearLineCount(0);
     }
   }, [clearLineCount, level]);
 
@@ -89,5 +91,6 @@ export const useGameState = (gameMode, clearLineCount) => {
     reset,
     dropDelay,
     lockDelay,
+    setClearLineCount,
   };
 };
