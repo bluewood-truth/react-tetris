@@ -3,34 +3,36 @@ import {useCallback, useEffect, useRef} from 'react';
 const defaultOption = {volume: 0.5, loop: false, autoPlay: false};
 
 export const useAudio = (url, option = {}) => {
-  const audio = useRef(null);
+  const audioRef = useRef(null);
   const {volume, loop, autoPlay} = {...defaultOption, ...option};
 
   useEffect(() => {
-    if (!audio.current) {
-      audio.current = new Audio(url);
-      return;
-    }
+    const audio = new Audio(url);
 
-    audio.current.volume = volume;
+    audio.volume = volume;
 
     if (loop) {
-      audio.current.loop = true;
+      audio.loop = true;
     }
 
     if (autoPlay) {
-      audio.current.play();
+      audio.play();
     }
+
+    audioRef.current = audio;
   }, [autoPlay, loop, url, volume]);
 
-  const play = useCallback((stopPrevPlay) => {
-    if (stopPrevPlay) stop();
-    audio.current.play();
-  }, [stop]);
+  const play = useCallback(
+    (stopPrevPlay) => {
+      if (stopPrevPlay) stop();
+      audioRef.current.play();
+    },
+    [stop]
+  );
 
   const stop = useCallback(() => {
-    audio.current.pause();
-    audio.current.currentTime = 0;
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
   }, []);
 
   return [play, stop];
