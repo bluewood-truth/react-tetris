@@ -3,8 +3,8 @@ export const tetrominos = {
     name: 'I',
     cells: [
       [0, 0, 0, 0],
-      [1, 1, 1, 1],
       [0, 0, 0, 0],
+      [1, 1, 1, 1],
       [0, 0, 0, 0],
     ],
     color: 'cyan',
@@ -24,7 +24,7 @@ export const tetrominos = {
     cells: [
       [0, 0, 0],
       [1, 1, 1],
-      [0, 0, 1],
+      [1, 0, 0],
     ],
     color: 'blue',
   },
@@ -33,7 +33,7 @@ export const tetrominos = {
     cells: [
       [0, 0, 0],
       [1, 1, 1],
-      [1, 0, 0],
+      [0, 0, 1],
     ],
     color: 'orange',
   },
@@ -41,8 +41,8 @@ export const tetrominos = {
     name: 'S',
     cells: [
       [0, 0, 0],
-      [0, 1, 1],
       [1, 1, 0],
+      [0, 1, 1],
     ],
     color: 'green',
   },
@@ -59,8 +59,8 @@ export const tetrominos = {
     name: 'Z',
     cells: [
       [0, 0, 0],
-      [1, 1, 0],
       [0, 1, 1],
+      [1, 1, 0],
     ],
     color: 'red',
   },

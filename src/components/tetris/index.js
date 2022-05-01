@@ -109,7 +109,6 @@ const useTetris = (gameMode) => {
       updateBlock(result.block);
       playRotateSound(true);
     } else {
-      console.log(result.message);
       playTouchWallSound(true);
     }
   };

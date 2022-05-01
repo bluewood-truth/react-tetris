@@ -36,10 +36,10 @@ export const rotateMatrix = (matrix) => {
       // 시계방향으로 네 모서리를 한꺼번에 스왑
       [matrix[r][c], matrix[c][n - r], matrix[n - r][n - c], matrix[n - c][r]] =
         [
-          matrix[n - c][r],
-          matrix[r][c],
           matrix[c][n - r],
           matrix[n - r][n - c],
+          matrix[n - c][r],
+          matrix[r][c],
         ];
     });
   });
