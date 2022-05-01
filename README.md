@@ -1,4 +1,4 @@
-![readme_logo](C:\Users\Bluewood\Desktop\readme_logo.png)
+![readme_logo](https://user-images.githubusercontent.com/55024033/166143771-e3cd2084-96aa-4f91-9b72-74bacabd84d0.png)
 
 <h2 align="middle">React로 구현한 테트리스 게임</h2>
 
