@@ -2,7 +2,7 @@
 
 <h2 align="middle">React로 구현한 테트리스 게임</h2>
 
-<p align="middle">View: <a href="http://ec2-3-230-151-39.compute-1.amazonaws.com/">React Tetris</a></p>
+<p align="middle">View: <a href="https://bluewood-react-tetris.netlify.app/">React Tetris</a></p>
 
 # 🎮 React Tetris
 
